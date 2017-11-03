@@ -1,0 +1,9 @@
+beautifulsoup4==4.6.0
+certifi==2017.7.27.1
+chardet==3.0.4
+idna==2.6
+requests==2.18.4
+robobrowser==0.5.3
+six==1.11.0
+urllib3==1.22
+Werkzeug==0.12.2
