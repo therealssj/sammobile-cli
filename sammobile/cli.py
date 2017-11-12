@@ -4,7 +4,7 @@ import json
 from robobrowser import RoboBrowser
 from requests.utils import dict_from_cookiejar, add_dict_to_cookiejar
 from tqdm import tqdm
-
+import argparse
 # @todo create a proper cli
 # @todo oop
 # @todo tests
@@ -14,6 +14,30 @@ def _save_session_cookie(cookie, file):
     cookie_dict = dict_from_cookiejar(cookie)
     with open(file, 'w') as f:
         json.dump(cookie_dict, f)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Download firmwares from sammobile"
+    )
+
+    parser.add_argument(
+        "-l",
+        "--link",
+        type=str,
+        nargs=1,
+        help="Link to the download page of the firmware"
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        nargs=1,
+        help="Output file name"
+    )
+
+    return parser
 
 
 def download_firmware(browser, firmware_file_url, firmware_file_path):
@@ -28,6 +52,12 @@ def download_firmware(browser, firmware_file_url, firmware_file_path):
             firmware_file.write(data)
 
 def main():
+    parser = parse_args()
+    args = parser.parse_args()
+    if not args.link or not args.output:
+        parser.print_help()
+        exit()
+
     if os.path.isfile("config.json"):
         config_file = "config.json"
     else:
@@ -39,8 +69,8 @@ def main():
 
         # browser instance
     browser = RoboBrowser(history=True, parser="html.parser")
-    firmware_file_path = sys.argv[1]
-    firmware_file_url = sys.argv[2]
+    firmware_file_path = args.output[0]
+    firmware_file_url = args.link[0]
     if os.path.isfile(config['cookiefile']):
         with open(config['cookiefile'], 'r') as cookie_file:
             # set session cookies
@@ -58,6 +88,4 @@ def main():
             _save_session_cookie(browser.session.cookies, config['cookiefile'])
             download_firmware(browser, firmware_file_url, firmware_file_path)
 
-if __name__ == "__main__":
-    main()
 
