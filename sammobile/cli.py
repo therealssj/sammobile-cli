@@ -45,6 +45,8 @@ def download_firmware(browser, firmware_file_url, firmware_file_path):
     a = browser.find("a", {"id": "regular"})
 
     request = browser.session.get(a['href'], stream=True)
+    dir = "/".join(firmware_file_path.split("/")[:-1])
+    os.makedirs(dir, exist_ok=True)
     with open(firmware_file_path, "wb") as firmware_file:
         for data in tqdm(request.iter_content(),
                          total=int(request.headers['Content-Length']),
@@ -89,3 +91,5 @@ def main():
             download_firmware(browser, firmware_file_url, firmware_file_path)
 
 
+if __name__ == "__main__":
+    main()
