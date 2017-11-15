@@ -48,10 +48,11 @@ def download_firmware(browser, firmware_file_url, firmware_file_path):
     dir = "/".join(firmware_file_path.split("/")[:-1])
     os.makedirs(dir, exist_ok=True)
     with open(firmware_file_path, "wb") as firmware_file:
-        for data in tqdm(request.iter_content(),
-                         total=int(request.headers['Content-Length']),
-                         unit='B', unit_scale=True):
-            firmware_file.write(data)
+        pbar = tqdm(total=int(int(request.headers['Content-Length'])/1024), unit='KB')
+        for chunk in request.iter_content(chunk_size=1024):
+            if chunk:                   # filter out keep-alive new chunks
+                pbar.update()
+                firmware_file.write(chunk)
 
 def main():
     parser = parse_args()
